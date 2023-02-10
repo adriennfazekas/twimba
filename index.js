@@ -11,19 +11,61 @@ tweetBtn.addEventListener("click", function() {
 document.addEventListener("click", function(e) {
     if (e.target.dataset.like) {
         handleLikeClick(e.target.dataset.like)
+    } 
+    else if (e.target.dataset.retweet) {
+        handleRetweetClick(e.target.dataset.retweet)
     }    
 })
 
 function handleLikeClick(tweetId) {
+    let targetTweetObj = tweetsData.filter( function (tweet) {
+        return tweet.uuid === tweetId
+    })[0] /* [0] megadja a tömbön belüli első tagot így objektumot kapunk vissza */
+
+    if (!targetTweetObj.isLiked) {
+        targetTweetObj.likes++
+    } else {
+        targetTweetObj.likes--
+    }
+    targetTweetObj.isLiked = !targetTweetObj.isLiked
+    render() 
+}
+/* handleLikeClick 
     tweetsData.forEach( function (tweet) {
         const targetTweetObj = tweet
-        return targetTweetObj
-    })    
+            if (targetTweetObj.uuid === tweetId) {
+                targetTweetObj.likes += 1
+            }                
+       })
+*/
+
+function handleRetweetClick(tweetId) {
+    let targetTweetObj = tweetsData.filter( function (tweet) {
+        return tweet.uuid === tweetId
+    })[0]
+
+    if (!targetTweetObj.isRetweeted) {
+        targetTweetObj.retweets++
+    } else {
+        targetTweetObj.retweets--
+    }
+    targetTweetObj.isRetweeted = !targetTweetObj.isRetweeted
+    render()
 }
 
 function getFeedHTML() {
     let feedHTML = ""
     tweetsData.forEach( function(tweet) {
+        let isLikedClass = ""
+        let isRetweetedClass = ""
+
+        if (tweet.isLiked) {
+            isLikedClass = "liked"
+        } 
+        if (tweet.isRetweeted) {
+            isRetweetedClass = "retweeted"
+        }
+
         feedHTML += `
         <div class="tweet">
             <div class="tweet-inner">
@@ -37,11 +79,11 @@ function getFeedHTML() {
                     ${tweet.replies.length}
                 </span>
                 <span class="tweet-detail">
-                    <i class="fa-solid fa-heart" data-like="${tweet.uuid}"></i>
+                    <i class="fa-solid fa-heart ${isLikedClass}" data-like="${tweet.uuid}"></i>
                     ${tweet.likes}
                 </span>
                 <span class="tweet-detail">
-                    <i class="fa-solid fa-retweet" data-retweet="${tweet.uuid}"></i>
+                    <i class="fa-solid fa-retweet ${isRetweetedClass}" data-retweet="${tweet.uuid}"></i>
                     ${tweet.retweets}
                 </span>
             </div>   
