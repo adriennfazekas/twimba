@@ -1,12 +1,13 @@
 import { tweetsData } from "./data.js"
+import { v4 as uuidv4 } from 'https://jspm.dev/uuid';
 
-const tweetInput = document.getElementById("tweet-input")
-const tweetBtn = document.getElementById("tweet-btn")
+/* const tweetBtn = document.getElementById("tweet-btn") */
 
-
-tweetBtn.addEventListener("click", function() {
+/* refactorálással egy eseménykezelőt kapunk
+    tweetBtn.addEventListener("click", function() {
     console.log(tweetInput.value)
-})
+    })
+*/
 
 document.addEventListener("click", function(e) {
     if (e.target.dataset.like) {
@@ -15,8 +16,11 @@ document.addEventListener("click", function(e) {
     else if (e.target.dataset.retweet) {
         handleRetweetClick(e.target.dataset.retweet)
     } 
-    else if (e.target.dataset.replies) {
+    else if (e.target.dataset.reply) {
         handleReplyClick(e.target.dataset.reply)
+    }
+    else if (e.target.id === "tweet-btn") { /* mivel itt elérjük a gomb elemet nem kell külön a const tweetBtn */
+        handleTweetBtnClick()
     }
 })
 
@@ -57,11 +61,30 @@ function handleRetweetClick(tweetId) {
 }
 
 function handleReplyClick(replyId){
-    const targetReplyObj = tweetsData.filter(function(tweet) {
-    return tweet.uuid === replyId
-    })[0]
-    console.log(targetReplyObj)
+    const replyEl = document.getElementById(`replies-${replyId}`)
+    replyEl.classList.toggle("hidden")
 }
+
+function handleTweetBtnClick() {
+    const tweetInput = document.getElementById("tweet-input")
+    
+    if (!tweetInput.value.length == "" ) {
+        let newTweet = {
+            handle: `@Scrimba`,
+            profilePic: `images/scrimbalogo.png`,
+            likes: 0,
+            retweets: 0,
+            tweetText: `${tweetInput.value}`,
+            replies: [],
+            isLiked: false,
+            isRetweeted: false,
+            uuid: uuidv4()
+        }
+        tweetsData.unshift(newTweet)
+        render()  
+        tweetInput.value = "" 
+    }
+}    
 
 
 function getFeedHTML() {
